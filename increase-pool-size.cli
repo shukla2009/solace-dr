@@ -1,0 +1,6 @@
+enable
+configure
+hardware message-spool max-spool-usage 10000
+message-spool message-vpn default
+max-spool-usage 10000
+home

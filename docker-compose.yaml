@@ -1,0 +1,89 @@
+# docker-compose -f PubSubStandard_singleNode.yml up
+version: '3.3'
+
+services:
+  primary:
+    container_name: primary
+    image: solace/solace-pubsub-standard:latest
+    volumes:
+      - "./active.cli:/tmp/replication"
+      - "storage-group-p:/var/lib/solace"
+    shm_size: 2g
+    ulimits:
+      core: -1
+      nofile:
+        soft: 2448
+        hard: 6592
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 1
+    ports:
+    #Port Mappings:  With the exception of SMF, ports are mapped straight
+    #through from host to container.  This may result in port collisions on
+    #commonly used ports that will cause failure of the container to start.
+      #Web transport
+      - '8080:8080'
+    environment:
+      - username_admin_globalaccesslevel=admin
+      - username_admin_password=admin
+      - system_scaling_maxconnectioncount=1000
+    hostname: primary
+  standby:
+    container_name: standby
+    image: solace/solace-pubsub-standard:latest
+    volumes:
+      - "./standby.cli:/tmp/replication"
+      - "storage-group-s:/var/lib/solace"
+    shm_size: 2g
+    ulimits:
+      core: -1
+      nofile:
+        soft: 2448
+        hard: 6592
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 1
+    ports:
+    #Port Mappings:  With the exception of SMF, ports are mapped straight
+    #through from host to container.  This may result in port collisions on
+    #commonly used ports that will cause failure of the container to start.
+      #Web transport
+      - '8081:8080'
+    environment:
+      - username_admin_globalaccesslevel=admin
+      - username_admin_password=admin
+      - system_scaling_maxconnectioncount=1000
+    hostname: standby
+  remote:
+    container_name: remote
+    image: solace/solace-pubsub-standard:latest
+    volumes:
+      - "storage-group-r:/var/lib/solace"
+    shm_size: 2g
+    ulimits:
+      core: -1
+      nofile:
+        soft: 2448
+        hard: 6592
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 1
+    ports:
+    #Port Mappings:  With the exception of SMF, ports are mapped straight
+    #through from host to container.  This may result in port collisions on
+    #commonly used ports that will cause failure of the container to start.
+      #Web transport
+      - '8082:8080'
+    environment:
+      - username_admin_globalaccesslevel=admin
+      - username_admin_password=admin
+      - system_scaling_maxconnectioncount=1000
+    hostname: remote
+
+volumes:
+  storage-group-p:
+  storage-group-s:
+  storage-group-r:

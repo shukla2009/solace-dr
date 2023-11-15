@@ -1,0 +1,13 @@
+enable
+configure
+config-sync
+no shutdown
+exit
+replication mate virtual-router-name v:primary
+replication mate connect-via primary:55555
+message-vpn default
+replication bridge authentication basic client-username default
+replication state standby
+replication
+no shutdown
+home
